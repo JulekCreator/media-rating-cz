@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Czech Media Rating - Hodnocení českých médií</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+        
+        h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .tagline {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .search-box {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 1.1em;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            transition: border-color 0.3s;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .media-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        
+        .media-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        
+        .media-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        .media-name {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .score-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        
+        .score {
+            font-size: 3em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .score-label {
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        .rating-bar {
+            height: 10px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+        
+        .rating-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.5s ease;
+        }
+        
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        
+        .metric {
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+        
+        .metric-name {
+            font-size: 0.85em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .metric-value {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        
+        .badge-high { background: #4caf50; color: white; }
+        .badge-medium { background: #ff9800; color: white; }
+        .badge-low { background: #f44336; color: white; }
+        
+        .stats {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .stats h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .stat-item {
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 10px;
+        }
+        
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎯 Czech Media Rating</h1>
+            <p class="tagline">Transparentní hodnocení důvěryhodnosti českých médií</p>
+        </header>
+        
+        <div class="search-box">
+            <input type="text" class="search-input" id="searchInput" placeholder="Vyhledejte médium nebo redakci...">
+        </div>
+        
+        <div class="media-grid" id="mediaGrid"></div>
+        
+        <div class="stats">
+            <h2>📊 Statistiky platformy</h2>
+            <div class="stat-grid">
+                <div class="stat-item">
+                    <div class="stat-number">15</div>
+                    <div class="stat-label">Hodnocených médií</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">250+</div>
+                    <div class="stat-label">Analyzovaných článků</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">98%</div>
+                    <div class="stat-label">Transparentnost dat</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const mediaData = [
+            { name: 'Česká televize', score: 85, accuracy: 90, transparency: 88, professionalism: 82, balance: 80 },
+            { name: 'Český rozhlas', score: 83, accuracy: 88, transparency: 85, professionalism: 80, balance: 79 },
+            { name: 'iDNES.cz', score: 72, accuracy: 75, transparency: 70, professionalism: 72, balance: 71 },
+            { name: 'Aktuálně.cz', score: 74, accuracy: 76, transparency: 73, professionalism: 74, balance: 73 },
+            { name: 'Novinky.cz', score: 68, accuracy: 70, transparency: 65, professionalism: 69, balance: 68 },
+            { name: 'Seznam Zprávy', score: 76, accuracy: 78, transparency: 75, professionalism: 76, balance: 75 },
+            { name: 'iROZHLAS.cz', score: 82, accuracy: 85, transparency: 83, professionalism: 80, balance: 80 },
+            { name: 'Deník N', score: 80, accuracy: 83, transparency: 78, professionalism: 81, balance: 78 },
+            { name: 'Lidovky.cz', score: 70, accuracy: 72, transparency: 68, professionalism: 71, balance: 69 },
+            { name: 'Blesk.cz', score: 45, accuracy: 50, transparency: 40, professionalism: 45, balance: 45 },
+            { name: 'Echo24.cz', score: 65, accuracy: 68, transparency: 63, professionalism: 65, balance: 64 },
+            { name: 'Právo', score: 67, accuracy: 70, transparency: 65, professionalism: 68, balance: 65 },
+            { name: 'Hospodářské noviny', score: 78, accuracy: 80, transparency: 77, professionalism: 79, balance: 76 },
+            { name: 'Forum24', score: 62, accuracy: 65, transparency: 60, professionalism: 63, balance: 60 },
+            { name: 'Parlamentní listy', score: 35, accuracy: 40, transparency: 30, professionalism: 35, balance: 35 }
+        ];
+        
+        function getBadgeClass(score) {
+            if (score >= 75) return 'badge-high';
+            if (score >= 55) return 'badge-medium';
+            return 'badge-low';
+        }
+        
+        function getBadgeText(score) {
+            if (score >= 75) return 'Vysoká důvěryhodnost';
+            if (score >= 55) return 'Střední důvěryhodnost';
+            return 'Nízká důvěryhodnost';
+        }
+        
+        function renderMediaCards(data) {
+            const grid = document.getElementById('mediaGrid');
+            grid.innerHTML = data.map(media => `
+                <div class="media-card">
+                    <div class="media-name">${media.name}</div>
+                    <div class="score-container">
+                        <div>
+                            <div class="score">${media.score}</div>
+                            <div class="score-label">Celkové skóre</div>
+                        </div>
+                    </div>
+                    <div class="rating-bar">
+                        <div class="rating-fill" style="width: ${media.score}%"></div>
+                    </div>
+                    <div class="metrics">
+                        <div class="metric">
+                            <div class="metric-name">Přesnost</div>
+                            <div class="metric-value">${media.accuracy}%</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-name">Transparentnost</div>
+                            <div class="metric-value">${media.transparency}%</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-name">Profesionalita</div>
+                            <div class="metric-value">${media.professionalism}%</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-name">Vyváženost</div>
+                            <div class="metric-value">${media.balance}%</div>
+                        </div>
+                    </div>
+                    <span class="badge ${getBadgeClass(media.score)}">
+                        ${getBadgeText(media.score)}
+                    </span>
+                </div>
+            `).join('');
+        }
+        
+        function filterMedia(searchTerm) {
+            const filtered = mediaData.filter(media => 
+                media.name.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            renderMediaCards(filtered);
+        }
+        
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            filterMedia(e.target.value);
+        });
+        
+        renderMediaCards(mediaData);
+    </script>
+</body>
+</html>
